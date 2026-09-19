@@ -1,6 +1,5 @@
 """
-Dashboard interactivo - Ventas SRI 2026
-By Ing. Angelina Faggioni
+Dashboard interactivo - Ventas SRI 2026 By Ing. Angelina Faggioni
 ------------------------------------------
 FASE 5 del proyecto: dashboard interactivo con diseño personalizado.
 
@@ -8,7 +7,6 @@ Para ejecutarlo:
     streamlit run dashboard.py
 """
 
-import json
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -117,13 +115,6 @@ def load_data():
 
 df = load_data()
 
-@st.cache_data
-def load_geojson():
-    with open('ecuador_provincias.geojson', encoding='utf-8') as f:
-        return json.load(f)
-
-geojson_ec = load_geojson()
-
 # --------------------------------------------------------------
 # Encabezado
 # --------------------------------------------------------------
@@ -181,34 +172,6 @@ def estilizar(fig):
     return fig
 
 # --------------------------------------------------------------
-# Mapa: ventas totales por provincia
-# --------------------------------------------------------------
-ventas_mapa = (
-    df_filtrado[df_filtrado['PROVINCIA'] != 'ND']
-    .groupby('PROVINCIA')['TOTAL_VENTAS'].sum()
-    .reset_index()
-)
-
-fig_mapa = px.choropleth(
-    ventas_mapa,
-    geojson=geojson_ec,
-    locations='PROVINCIA',
-    featureidkey='properties.name_upper',
-    color='TOTAL_VENTAS',
-    color_continuous_scale=[[0, CARD_BG], [0.5, ACCENT_TEAL], [1, ACCENT_GOLD]],
-    title='Ventas totales por provincia',
-    hover_name='PROVINCIA',
-    labels={'TOTAL_VENTAS': 'Ventas (USD)'},
-)
-fig_mapa.update_geos(fitbounds='locations', visible=False, bgcolor=BG)
-fig_mapa = estilizar(fig_mapa)
-fig_mapa.update_layout(
-    height=550,
-    coloraxis_colorbar=dict(title='USD', tickformat=',.0f'),
-)
-st.plotly_chart(fig_mapa, use_container_width=True)
-
-# --------------------------------------------------------------
 # Gráfico 1: evolución mensual
 # --------------------------------------------------------------
 ventas_mes = df_filtrado.groupby('MES')['TOTAL_VENTAS'].sum().reset_index()
@@ -251,11 +214,6 @@ with col5:
     fig3.update_layout(yaxis={'categoryorder': 'total ascending'})
     st.plotly_chart(estilizar(fig3), use_container_width=True)
 
-# --------------------------------------------------------------
-# Tabla de detalle
-# --------------------------------------------------------------
-st.subheader("Detalle de datos filtrados")
-st.dataframe(df_filtrado.head(200), use_container_width=True)
 # --------------------------------------------------------------
 # Tabla de detalle
 # --------------------------------------------------------------
